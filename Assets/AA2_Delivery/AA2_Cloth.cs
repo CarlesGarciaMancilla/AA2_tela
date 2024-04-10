@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,10 +24,18 @@ public class AA2_Cloth
     [System.Serializable]
     public struct ClothSettings
     {
-        public float estructuralElasticCoef;
-        public float damptCoef;
-
-        public float estructuralSpringL;
+        [Header("Structural Sring")]
+        public float structuralElasticCoef;
+        public float structuralDampCoef;
+        public float structuralSpring;
+        [Header("Shear Sring")]
+        public float shearElasticCoef;
+        public float shearDampCoef;
+        public float shearSpring;
+        [Header("Bending Sring")]
+        public float bendingElasticCoef;
+        public float bendingDampCoef;
+        public float bendingSpring;
     }
     public ClothSettings clothSettings;
 
@@ -58,24 +67,32 @@ public class AA2_Cloth
     public Vertex[] points;
     public void Update(float dt)
     {
-        //System.Random rnd = new System.Random();
-        int totalVertices = settings.xPartSize + 1;
-        for (int i = settings.yPartSize+1; i < points.Length; i++)
+        int xVertices = settings.xPartSize + 1;
+        int yVertices = settings.yPartSize + 1;
+
+        Vector3C[] structuralForces = new Vector3C[points.Length];
+
+        for (int i = 0; i < points.Length; i++)
         {
-            
-            float magnitudY = (points[i - totalVertices].actualPosition - points[i].actualPosition).magnitude - clothSettings.estructuralSpringL;
-            Vector3C forceVector = (points[i - totalVertices].actualPosition - points[i].actualPosition).normalized * magnitudY;
-            Vector3C damtingForce = (points[i].velocity - points[i - totalVertices].velocity) * clothSettings.damptCoef;
-            Vector3C estructuralSpringForce = (forceVector * clothSettings.estructuralElasticCoef) - damtingForce;
-
-            //points[i].actualPosition = points[i].lastPosition;
-            //points[i].actualPosition.y = rnd.Next(100) * 0.01f;
-            points[i].Euler(settings.gravity + estructuralSpringForce, dt);
-
+            //STRUCTURAL VERTICAL
+            if (i > xVertices - 1)
+            {
+                float structMagnitudeY = (points[i - xVertices].actualPosition - points[i].actualPosition).magnitude
+                                        - clothSettings.structuralSpring;
+                Vector3C structForceVector = (points[i - xVertices].actualPosition
+                    - points[i].actualPosition).normalized * structMagnitudeY * clothSettings.structuralElasticCoef;
+                Vector3C structDampForceVector = (points[i].velocity
+                    - points[i - xVertices].velocity) * clothSettings.structuralDampCoef;
+                structuralForces[i] = structuralForces[i] + structForceVector;
+                structuralForces[i] = structuralForces[i]  - structDampForceVector;
+                structuralForces[i - xVertices] = structuralForces[i - xVertices] - structForceVector;
+            }
+        }
+        for (int i = xVertices; i < points.Length; i++)
+        {
+            points[i].Euler(settings.gravity + structuralForces[i], dt);
         }
     }
-
-    
 
     public void Debug()
     {

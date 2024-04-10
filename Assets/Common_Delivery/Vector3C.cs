@@ -57,7 +57,7 @@ public struct Vector3C
 
     public static Vector3C operator -(Vector3C a)
     {
-        return -a;
+        return (-a);
     }
 
     public static Vector3C operator +(Vector3C a, Vector3C b)
