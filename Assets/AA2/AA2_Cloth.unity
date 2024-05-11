@@ -231,19 +231,22 @@ MonoBehaviour:
       xPartSize: 10
       yPartSize: 10
     clothSettings:
-      structuralElasticCoef: 0.1
-      structuralDampCoef: 0.1
-      structuralSpring: 0.1
-      shearElasticCoef: 0.1
-      shearDampCoef: 0.1
-      shearSpring: 0.1
-      bendingElasticCoef: 0.1
-      bendingDampCoef: 0.1
-      bendingSpring: 0.1
+      structuralElasticCoef: 1000
+      structuralDampCoef: 1
+      structuralSpring: 1
+      structuralMaxL: 0.5
+      shearElasticCoef: 100
+      shearDampCoef: 1
+      shearSpring: 5
+      shearMaxL: 0.5
+      bendingElasticCoef: 1
+      bendingDampCoef: 1
+      bendingSpring: 2
+      bendingMaxL: 0.5
     settingsCollision:
       sphere:
         position:
           x: 0
-          y: -4
-          z: 0
+          y: -10
+          z: -5
         radius: 3
