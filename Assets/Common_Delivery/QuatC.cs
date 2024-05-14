@@ -15,7 +15,7 @@ public struct QuatC
     #endregion
 
     #region PROPIERTIES
-    private static QuatC NullQ
+    public static QuatC zero
     {
         get
         {
@@ -37,6 +37,15 @@ public struct QuatC
         this.x = x; 
         this.y = y; 
         this.z = z;
+
+    }
+
+    public QuatC(float w, Vector3C vector)
+    {
+        this.w = w;
+        this.x = vector.x;
+        this.y = vector.y;
+        this.z = vector.z;
 
     }
     #endregion
@@ -154,6 +163,16 @@ public struct QuatC
 
         return result;
 
+    }
+
+    public static Vector3C RotateVector(QuatC q, Vector3C v)
+    {
+        QuatC p = new QuatC(0, v.x, v.y, v.z);
+        QuatC qInv = new QuatC(q.w, -q.x, -q.y, -q.z);
+
+        QuatC rotated = Multiply(Multiply(q, p), qInv);
+
+        return new Vector3C(rotated.x, rotated.y, rotated.z);
     }
 
     #endregion
