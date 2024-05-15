@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using static AA2_Cloth;
 
 [System.Serializable]
@@ -64,16 +65,28 @@ public class AA2_Rigidbody
     public void Update(float dt)
     {
 
-
-        crb.Euler(settings.gravity,dt);
-        if (crb.euler.x < 10) 
-        {
-            crb.euler = QuatC.RotateVector(crb.rotation, crb.euler);
-        }
-        //for (int i = 0; i < settingsCollision.planes.Length; i++) 
+        
+        //if (crb.euler.x < 10) 
         //{
-        //    CollisionPlane(crb, settingsCollision.planes[i]);
+        //    crb.euler = QuatC.RotateVector(crb.rotation, crb.euler);
         //}
+
+        for (int i = 0; i < settingsCollision.planes.Length; i++)
+        {
+            CollisionPlane(crb, settingsCollision.planes[i]);
+
+            if (CollisionPlane(crb, settingsCollision.planes[3]) == true)
+            {
+                UnityEngine.Debug.Log("true");
+                crb.euler = CollisionPlaneVel(crb, settingsCollision.planes[3]);
+            }
+            else
+            {
+                crb.Euler(settings.gravity, dt);
+            }
+        }
+
+       
 
     }
 
@@ -85,35 +98,57 @@ public class AA2_Rigidbody
         }
     }
 
-    
 
-    public void CollisionPlane(CubeRigidbody cubo, PlaneC plano)
-    {
-        // Comprobar si la partícula está delante o detrás del plano
-        float dotProduct = Vector3C.Dot(plano.normal, cubo.position - plano.position);
-        UnityEngine.Debug.Log("dot product" + dotProduct);
-        if (dotProduct <= 0)
+
+        public bool CollisionPlane(CubeRigidbody cubo, PlaneC plano)
         {
-            // Trazar una línea/rayo desde la posición anterior a la posición actual de la partícula
-            Vector3C rayo = (cubo.position - cubo.lastPosition).normalized;
+            float distance = Vector3C.Dot(cubo.position, plano.normal) - (cubo.position.magnitude - plano.position.magnitude);
 
-            // Calcular la intersección de la línea con el plano
-            float t = Vector3C.Dot(plano.position - cubo.lastPosition, plano.normal) / Vector3C.Dot(rayo, plano.normal);
-            Vector3C intersectionPoint = cubo.lastPosition + rayo * t;
+            if (distance < 0)
+            {
+            
+                // Collision occurred, handle the collision here
+                // For example, you can reflect the velocity of the cube based on the plane's normal
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
 
-            // El punto de intersección será la nueva posición de la partícula
+    public Vector3C CollisionPlaneVel(CubeRigidbody cubo, PlaneC plano)
+    {
+        // Check if the particle is behind the plane
+        float distance = Vector3C.Dot(cubo.position, plano.normal) - (cubo.position.magnitude - plano.position.magnitude);
+
+        if (distance < 0)
+        {
+            // Calculate the ray from the previous position to the current position of the particle
+            Vector3C ray = (cubo.position - cubo.lastPosition).normalized;
+
+            // Calculate the intersection of the ray with the plane
+            float t = Vector3C.Dot(plano.position - cubo.lastPosition, plano.normal) / Vector3C.Dot(ray, plano.normal);
+            Vector3C intersectionPoint = cubo.lastPosition + ray * t;
+
+            // Update the position of the particle to the intersection point
             cubo.position = intersectionPoint;
 
-            // Reflejar la velocidad de la partícula con respecto a la normal del plano
+            // Reflect the velocity of the particle with respect to the plane's normal
             Vector3C reflectedVelocity = Vector3C.Reflect(cubo.euler, plano.normal);
 
-            // Multiplicar la velocidad de la partícula por el coefficient de restitución
-            // Puedes ajustar este valor según sea necesario (debe estar entre 0 y 1)
-            Vector3C finalVelocity = reflectedVelocity * settings.bounce;//ni idea si esta bien
+            // Multiply the particle's velocity by the coefficient of restitution
+            // Adjust this value as needed (should be between 0 and 1)
+            Vector3C finalVelocity = reflectedVelocity;
 
-            cubo.euler = finalVelocity;
-            // Mostrar resultados
+            return finalVelocity;
 
+            // Display results or perform any additional actions
         }
+        else 
+        {
+            return Vector3C.zero;
+        }
+
     }
 }
