@@ -65,7 +65,7 @@ public class AA2_Rigidbody
     public void Update(float dt)
     {
 
-        
+        crb.Euler(settings.gravity, dt);
         //if (crb.euler.x < 10) 
         //{
         //    crb.euler = QuatC.RotateVector(crb.rotation, crb.euler);
@@ -75,15 +75,8 @@ public class AA2_Rigidbody
         {
             CollisionPlane(crb, settingsCollision.planes[i]);
 
-            if (CollisionPlane(crb, settingsCollision.planes[3]) == true)
-            {
-                UnityEngine.Debug.Log("true");
-                crb.euler = CollisionPlaneVel(crb, settingsCollision.planes[3]);
-            }
-            else
-            {
-                crb.Euler(settings.gravity, dt);
-            }
+                
+            
         }
 
        
@@ -100,24 +93,9 @@ public class AA2_Rigidbody
 
 
 
-        public bool CollisionPlane(CubeRigidbody cubo, PlaneC plano)
-        {
-            float distance = Vector3C.Dot(cubo.position, plano.normal) - (cubo.position.magnitude - plano.position.magnitude);
 
-            if (distance < 0)
-            {
-            
-                // Collision occurred, handle the collision here
-                // For example, you can reflect the velocity of the cube based on the plane's normal
-                return true;
-            }
-            else 
-            {
-                return false;
-            }
-        }
 
-    public Vector3C CollisionPlaneVel(CubeRigidbody cubo, PlaneC plano)
+    public void CollisionPlane(CubeRigidbody cubo, PlaneC plano)
     {
         // Check if the particle is behind the plane
         float distance = Vector3C.Dot(cubo.position, plano.normal) - (cubo.position.magnitude - plano.position.magnitude);
@@ -139,16 +117,13 @@ public class AA2_Rigidbody
 
             // Multiply the particle's velocity by the coefficient of restitution
             // Adjust this value as needed (should be between 0 and 1)
-            Vector3C finalVelocity = reflectedVelocity;
+           settings.gravity -= reflectedVelocity;
 
-            return finalVelocity;
+            
 
             // Display results or perform any additional actions
         }
-        else 
-        {
-            return Vector3C.zero;
-        }
+     
 
     }
 }
