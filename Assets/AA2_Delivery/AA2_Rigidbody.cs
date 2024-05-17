@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using static AA2_Cloth;
 
 [System.Serializable]
@@ -20,8 +19,6 @@ public class AA2_Rigidbody
     }
     public SettingsCollision settingsCollision;
 
-    
-
     [System.Serializable]
     public struct CubeRigidbody
     {
@@ -39,7 +36,7 @@ public class AA2_Rigidbody
             position = _position;
             size = _size;
             euler = _euler;
-            rotation = new QuatC(1.0f, 1.0f, 0.0f, 0.0f);
+            rotation = new QuatC(1.0f, 0.0f, 1.0f, 0.0f);
 
         }
 
@@ -50,13 +47,14 @@ public class AA2_Rigidbody
             position += euler * dt;
         }
 
-        public void RotiationEuler(Vector3C axis, float angle)
+        public void RotationEuler(Vector3C axis, float angle)
         {
             float halfAngle = angle * 0.5f;
             float s = (float)Math.Sin(halfAngle);
 
             QuatC rotationQuat = new QuatC((float)Math.Cos(halfAngle), axis.x * s, axis.y * s, axis.z * s);
             rotation = QuatC.Multiply(rotationQuat, rotation);
+            
         }
 
 
@@ -66,34 +64,18 @@ public class AA2_Rigidbody
     {
 
         crb.Euler(settings.gravity, dt);
-        //if (crb.euler.x < 10) 
-        //{
-        //    crb.euler = QuatC.RotateVector(crb.rotation, crb.euler);
-        //}
+       
+            
+        
+
 
         for (int i = 0; i < settingsCollision.planes.Length; i++)
         {
             CollisionPlane(crb, settingsCollision.planes[i]);
 
-                
-            
         }
 
-       
-
     }
-
-    public void Debug()
-    {
-        foreach (var item in settingsCollision.planes)
-        {
-            item.Print(Vector3C.red);
-        }
-    }
-
-
-
-
 
     public void CollisionPlane(CubeRigidbody cubo, PlaneC plano)
     {
@@ -117,13 +99,22 @@ public class AA2_Rigidbody
 
             // Multiply the particle's velocity by the coefficient of restitution
             // Adjust this value as needed (should be between 0 and 1)
-           settings.gravity -= reflectedVelocity;
-
-            
+            settings.gravity -= reflectedVelocity * settings.bounce;
 
             // Display results or perform any additional actions
         }
-     
+        
 
     }
+
+
+    public void Debug()
+    {
+        foreach (var item in settingsCollision.planes)
+        {
+            item.Print(Vector3C.red);
+        }
+    }
+
+
 }
