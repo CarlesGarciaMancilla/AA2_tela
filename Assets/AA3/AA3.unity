@@ -169,13 +169,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5689b4629445384ea79cb805c1ecaf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 10
-  height: 10
+  width: 50
+  height: 50
   xSize: 100
   ySize: 100
   mesh: {fileID: 0}
   waves:
-    wavesSettings: []
+    settings:
+      gravity: -9.81
+    buoySettings:
+      density: 0.5
+      velocity: 1
+      mass: 25
+      coefficient: 1
+    buoy:
+      position:
+        x: 1
+        y: 0
+        z: 1
+      radius: 5
+    wavesSettings:
+    - amplitude: 1
+      frequency: 0.1
+      phase: 0
+      speed: 1
+      waveLength: 10
+      direction:
+        x: 1.5
+        y: 1
+        z: 1
+    - amplitude: 1
+      frequency: 0.1
+      phase: 0
+      speed: 1
+      waveLength: 10
+      direction:
+        x: 1
+        y: 1
+        z: 3
 --- !u!33 &83351505
 MeshFilter:
   m_ObjectHideFlags: 0
